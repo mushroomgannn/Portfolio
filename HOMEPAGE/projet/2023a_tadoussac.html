@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tadoussac</title>
+  <link rel="stylesheet" href="../0_homepage.css">
+</head>
+<body>
+  <main id="main-content">
+
+    <!-- ZONES DE CLIC -->
+    <div id="click-left"></div>
+    <div id="click-right"></div>
+
+    <!-- VISIONNEUSE -->
+    <div id="project-viewer">
+      <div id="sequence-container"></div>
+      <img id="project-img" src="" alt="">
+      <div id="slide-meta">
+        <div id="img-caption"></div>
+        <div id="progress"></div>
+      </div>
+    </div>
+
+    <div id="backdrop" class="backdrop-info"></div>
+    <div class="panel" id="project-panel">
+      <h2>À propos de Tadoussac</h2>
+      <p>Portrait du projet et contexte de recherche.</p>
+      <button id="panel-close" type="button">x</button>
+    </div>
+
+    <!-- INFOS PROJET -->
+    <div id="projet-info">
+
+      <!-- Description liée à l'image — change dynamiquement -->
+      <div id="img-description"></div>
+
+      <div class="info-divider"></div>
+
+      <!-- Infos générales — fixes -->
+      <div id="projet-general">
+        <button id="project-trigger" type="button">
+          <h2>Tadoussac</h2>
+          <h3>Projet en construction</h3>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+  window.projectData = {"title": "Tadoussac", "subtitle": "Projet en construction", "panelBody": "Portrait du projet et contexte de recherche.", "slides": []};
+  </script>
+  <script src="../shared/common.js" defer></script>
+</body>
+</html>

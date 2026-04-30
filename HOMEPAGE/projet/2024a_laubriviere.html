@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laubrivière</title>
+  <link rel="stylesheet" href="../0_homepage.css">
+</head>
+
+<body>
+  <main>
+
+    <!-- ZONES DE CLIC -->
+    <div id="click-left"  onclick="prevSlide()"></div>
+    <div id="click-right" onclick="nextSlide()"></div>
+
+    <!-- VISIONNEUSE -->
+    <div id="project-viewer">
+      <div id="sequence-container"></div>
+      <img id="project-img" src="" alt="">
+      <div id="slide-meta">
+        <div id="img-caption"></div>
+        <div id="progress"></div>
+      </div>
+    </div>
+
+    <div id="backdrop" class="backdrop-info"></div>
+    <div class="panel" id="project-panel">
+      <h4>2024		Québec, Canada</br>
+      Atelier III</br>
+      Supervisé par Pascal Labelle</h4>
+      <p>Le projet s’inscrit dans le contexte de la réhabilitation de l’ancienne maison Lauberivière, aujourd’hui en ruine, au-dessus d’un espace de production brassicole. Le projet interroge la possibilité d’habiter autrement, en accueillant une communauté de contre-culture fondée sur l’autosubsistance, l’autoconstruction et le partage. Dans un monde où le logement est souvent standardisé et figé, Autarkia propose une alternative : un cadre ouvert, inachevé, qui invite les habitants à devenir acteurs de leur propre espace.</p>
+      <p>L’enjeu principal est de trouver un équilibre entre liberté et structure. Jusqu’où peut-on laisser les usagers construire sans perdre la lisibilité et la cohérence spatiale ? Comment concevoir une architecture qui n’impose pas, mais qui suggère, guide et inspire ? Le projet explore cette tension à travers des fragments de murs, des trames superposées et des noyaux de services accessibles, permettant des branchements spontanés et une appropriation progressive.</p>
+      <p>Les questions soulevées sont multiples : comment organiser l’informel sans le figer ? Comment intégrer des systèmes techniques ouverts et évolutifs ? Et surtout, comment permettre à une communauté vivante de continuer à transformer l’architecture dans le temps, au-delà même de sa conception initiale ?</p>
+      <button id="panel-close" type="button">x</button>
+    </div>
+
+    <!-- INFOS PROJET -->
+    <div id="projet-info">
+
+      <!-- Description liée à l'image — change dynamiquement -->
+      <div id="img-description"></div>
+
+      <div class="info-divider"></div>
+
+      <!-- Infos générales — fixes -->
+      <div id="projet-general">
+        <button id="project-trigger" type="button">
+          <h2>Laubrivière</h2>
+          <h3>Patrimoine, contre-culture et autosuffisance</h3>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="../shared/common.js" defer></script>
+
+  <script z-index="1">
+    // ── DONNÉES : images + légende + description ──
+    const slides = [
+      {
+        img: 'img_laubriviere/01.jpg',
+        caption: 'Vue d\'ensemble',
+        description: ''
+      },
+      {
+        img: 'img_laubriviere/02.jpg',
+        caption: 'Plan masse',
+        description: ''
+      },
+      {
+        img: 'img_laubriviere/03.png',
+        caption: 'Coupe transversale',
+        description: '',
+      },
+      {
+        img: 'img_laubriviere/04.jpg',
+        caption: 'Détail de façade',
+        description: '',
+        width:'50%'
+      },
+      
+      {
+        img: 'img_laubriviere/05.jpg',
+        caption: 'Détail de façade',
+        description: '',
+        width:'40%'
+      },
+      {
+        img: 'img_laubriviere/06.jpg',
+        caption: 'Détail de façade',
+        description: '',
+        
+      },
+      {
+        img: 'img_laubriviere/07.jpg',
+        caption: 'Détail de façade',
+        description: ''
+      },
+      
+    ];
+
+    let current = 0;
+
+    const imgEl          = document.getElementById('project-img');
+    const captionEl      = document.getElementById('img-caption');
+    const progressEl     = document.getElementById('progress');
+    const descriptionEl  = document.getElementById('img-description');
+    const projectViewer  = document.getElementById('project-viewer');
+    const projetGeneral  = document.getElementById('projet-general');
+    const projectTrigger = document.getElementById('project-trigger');
+    const projectPanel   = document.getElementById('project-panel');
+    const backdropEl     = document.getElementById('backdrop');
+
+    let sequenceTimer = null;
+    let sequenceIndex = 0;
+
+    function applyImageWidth(slide) {
+      if (slide.width) {
+        imgEl.style.width = slide.width;
+      } else {
+        imgEl.style.width = 'auto';
+      }
+    }
+
+    function stopSequence() {
+      if (sequenceTimer) {
+        clearInterval(sequenceTimer);
+        sequenceTimer = null;
+      }
+    }
+
+    function startSequence(slide) {
+      applyImageWidth(slide);
+
+      if (!Array.isArray(slide.sequence) || slide.sequence.length === 0) {
+        imgEl.src = slide.img;
+        return;
+      }
+
+      sequenceIndex = 0;
+      imgEl.src = slide.sequence[sequenceIndex];
+
+      sequenceTimer = setInterval(() => {
+        sequenceIndex = (sequenceIndex + 1) % slide.sequence.length;
+        imgEl.src = slide.sequence[sequenceIndex];
+      }, 1500);
+    }
+
+    function showSlide(index) {
+      const slide = slides[index];
+      stopSequence();
+
+      imgEl.alt = slide.caption;
+      captionEl.textContent     = slide.caption;
+      descriptionEl.textContent = slide.description;
+      progressEl.textContent    = `${index + 1} / ${slides.length}`;
+      startSequence(slide);
+    }
+
+    function openProjectPanel() {
+      projetGeneral.classList.add('open');
+      projectViewer.classList.add('blurred');
+      backdropEl.classList.add('visible', 'backdrop-info');
+      projectPanel.classList.add('displayed');
+    }
+
+    function closeProjectPanel() {
+      projetGeneral.classList.remove('open');
+      projectViewer.classList.remove('blurred');
+      backdropEl.classList.remove('visible', 'backdrop-info');
+      projectPanel.classList.remove('displayed');
+    }
+
+    projectTrigger.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      openProjectPanel();
+    });
+
+    backdropEl.addEventListener('click', closeProjectPanel);
+    document.getElementById('panel-close').addEventListener('click', closeProjectPanel);
+
+    function nextSlide() {
+      current = (current + 1) % slides.length;
+      showSlide(current);
+    }
+
+    function prevSlide() {
+      current = (current - 1 + slides.length) % slides.length;
+      showSlide(current);
+    }
+
+    // Navigation clavier
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft')  prevSlide();
+      if (e.key === 'Escape')   closeProjectPanel();
+    });
+
+    // Init
+    showSlide(0);
+  </script>
+
+</body>
+</html>

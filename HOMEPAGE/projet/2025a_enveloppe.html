@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tamis — Peterbos</title>
+  <link rel="stylesheet" href="../0_homepage.css">
+</head>
+
+<body>
+  <main>
+
+    <!-- ZONES DE CLIC -->
+    <div id="click-left"  onclick="prevSlide()"></div>
+    <div id="click-right" onclick="nextSlide()"></div>
+
+    <!-- VISIONNEUSE -->
+    <div id="project-viewer">
+      <div id="sequence-container"></div>
+      <img id="project-img" src="" alt="">
+      <div id="slide-meta">
+        <div id="img-caption"></div>
+        <div id="progress"></div>
+      </div>
+    </div>
+
+    <div id="backdrop" class="backdrop-info"></div>
+    <div class="panel" id="project-panel">
+      <h4>2025		Lévis, Canada</br>
+      Anatomie systématique du bâtiment</br>
+      Supervisé par Richard Pleau</br></h4>
+      <h3>Le projet naît d’une écoute du territoire, où chaque trace devient une direction. À Bandafassi, le sol est traversé de mouvements : lignes de migration, souffle des saisons, chemins vers la montagne, rythmes des corps en danse. Le concept s’ancre dans cette idée de dynamique vivante, inspirée des musiques Bédik, où une structure répétitive se transforme sans jamais se rompre.</h3>
+      <h3>Une courbe émerge, comme un geste continu, reliant mémoire et présent. Elle suit les flux, s’infléchit avec le terrain, et devient architecture. Elle abrite un programme composé d’un centre d’interprétation, d’une école des métiers, de résidences et d’espaces collectifs, organisés autour de cours ouvertes.</h3>
+      <h3>L’architecture respire avec le climat : la terre absorbe, le bois structure, l’air circule. Les espaces ne sont pas figés, ils vibrent, s’adaptent, se transforment.</h3>
+      <h3>Le projet devient alors un paysage habité, où le mouvement construit l’espace, et où l’oubli laisse place à une mémoire en devenir.</h3>
+      <button id="panel-close" type="button">x</button>
+    </div>
+
+    <!-- INFOS PROJET -->
+    <div id="projet-info">
+
+      <!-- Description liée à l'image — change dynamiquement -->
+      <div id="img-description"></div>
+
+      <div class="info-divider"></div>
+
+      <!-- Infos générales — fixes -->
+      <div id="projet-general">
+        <button id="project-trigger" type="button">
+          <h2>Espace coworking</h2>
+          <h3>Anatomie systématique du bâtiment</h3>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="../shared/common.js" defer></script>
+
+  <script z-index="1">
+    // ── DONNÉES : images + légende + description ──
+    const slides = [
+      {
+        img: 'img_enveloppe/01.png',
+        caption: 'Vue d\'ensemble',
+        description: ''
+      },
+      {
+        img: 'img_enveloppe/02.png',
+        caption: 'Plan masse',
+        description: ''
+      },
+      {
+        img: 'img_enveloppe/03_2.png',
+        caption: 'Coupe transversale',
+        description: '',
+        width: '110%'
+      },
+      {
+        img: 'img_enveloppe/04_1.png',
+        caption: 'Détail de façade',
+        description: ''
+      },
+      
+    ];
+
+    let current = 0;
+
+    const imgEl          = document.getElementById('project-img');
+    const captionEl      = document.getElementById('img-caption');
+    const progressEl     = document.getElementById('progress');
+    const descriptionEl  = document.getElementById('img-description');
+    const projectViewer  = document.getElementById('project-viewer');
+    const projetGeneral  = document.getElementById('projet-general');
+    const projectTrigger = document.getElementById('project-trigger');
+    const projectPanel   = document.getElementById('project-panel');
+    const backdropEl     = document.getElementById('backdrop');
+
+    let sequenceTimer = null;
+    let sequenceIndex = 0;
+
+    function applyImageWidth(slide) {
+      if (slide.width) {
+        imgEl.style.width = slide.width;
+      } else {
+        imgEl.style.width = 'auto';
+      }
+    }
+
+    function stopSequence() {
+      if (sequenceTimer) {
+        clearInterval(sequenceTimer);
+        sequenceTimer = null;
+      }
+    }
+
+    function startSequence(slide) {
+      applyImageWidth(slide);
+
+      if (!Array.isArray(slide.sequence) || slide.sequence.length === 0) {
+        imgEl.src = slide.img;
+        return;
+      }
+
+      sequenceIndex = 0;
+      imgEl.src = slide.sequence[sequenceIndex];
+
+      sequenceTimer = setInterval(() => {
+        sequenceIndex = (sequenceIndex + 1) % slide.sequence.length;
+        imgEl.src = slide.sequence[sequenceIndex];
+      }, 1500);
+    }
+
+    function showSlide(index) {
+      const slide = slides[index];
+      stopSequence();
+
+      imgEl.alt = slide.caption;
+      captionEl.textContent     = slide.caption;
+      descriptionEl.textContent = slide.description;
+      progressEl.textContent    = `${index + 1} / ${slides.length}`;
+      startSequence(slide);
+    }
+
+    function openProjectPanel() {
+      projetGeneral.classList.add('open');
+      projectViewer.classList.add('blurred');
+      backdropEl.classList.add('visible', 'backdrop-info');
+      projectPanel.classList.add('displayed');
+    }
+
+    function closeProjectPanel() {
+      projetGeneral.classList.remove('open');
+      projectViewer.classList.remove('blurred');
+      backdropEl.classList.remove('visible', 'backdrop-info');
+      projectPanel.classList.remove('displayed');
+    }
+
+    projectTrigger.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      openProjectPanel();
+    });
+
+    backdropEl.addEventListener('click', closeProjectPanel);
+    document.getElementById('panel-close').addEventListener('click', closeProjectPanel);
+
+    function nextSlide() {
+      current = (current + 1) % slides.length;
+      showSlide(current);
+    }
+
+    function prevSlide() {
+      current = (current - 1 + slides.length) % slides.length;
+      showSlide(current);
+    }
+
+    // Navigation clavier
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft')  prevSlide();
+      if (e.key === 'Escape')   closeProjectPanel();
+    });
+
+    // Init
+    showSlide(0);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tamis — Peterbos</title>
+  <link rel="stylesheet" href="../0_homepage.css">
+</head>
+
+<body>
+  <main>
+
+    <!-- ZONES DE CLIC -->
+    <div id="click-left"  onclick="prevSlide()"></div>
+    <div id="click-right" onclick="nextSlide()"></div>
+
+    <!-- VISIONNEUSE -->
+    <div id="project-viewer">
+      <div id="sequence-container"></div>
+      <img id="project-img" src="" alt="">
+      <div id="slide-meta">
+        <div id="img-caption"></div>
+        <div id="progress"></div>
+      </div>
+    </div>
+
+    <div id="backdrop" class="backdrop-info" ></div>
+    <div class="panel" id="project-panel" style="border: 0px solid #ccc;">
+      <h4>2025     Bruxelles, Belgique <br/>P7/9 Bruxelles, les modernités parallèles (ENSA Paris-Malaquais)<br/>Supervisé par Édouard Ropars et Yves Bélorgey</h4>
+      <h3>Le quartier de Peterbos, à Bruxelles, se déploie comme un parc habité : un territoire où plusieurs programmes distincts coexistent sans se confondre. Développés séparément, ces projets partagent néanmoins un même sol et entretiennent, à travers lui, un dialogue spatial et programmatique.</h3>
+      <h3>L’intention principale est de filtrer plutôt que séparer. Plutôt que d’opposer intérieur et extérieur, le projet met en place une succession de transitions et de seuils, permettant aux habitants de passer progressivement d’un espace à l’autre. Cette approche rend possible une présence à l’extérieur plus douce, plus rassurante, et plus naturelle. Ce principe de filtre s’exprime aussi sur le plan climatique : l’architecture laisse entrer la lumière, capte le soleil, et favorise une ventilation naturelle, tout en protégeant des excès.</h3>
+      <h3>Le projet s’appuie sur une réalité déjà existante : une communauté présente et active. Il ne cherche pas à la recréer, mais à la soutenir, en proposant des espaces qui favorisent les rencontres spontanées, les échanges du quotidien, et les moments partagés</h3>
+      <h3>Tamis ne transforme pas le quartier par rupture, mais par attention. Il filtre les distances, apprivoise les seuils, et révèle ce qui était déjà là : une communauté, des regards, une manière d’être ensemble.</h3>
+      <button id="panel-close" type="button">x</button>
+    </div>
+
+    <!-- INFOS PROJET -->
+    <div id="projet-info">
+
+      <!-- Description liée à l'image — change dynamiquement -->
+      <div id="img-description"></div>
+
+      <div class="info-divider"></div>
+
+      <!-- Infos générales — fixes -->
+      <div id="projet-general">
+        <button id="project-trigger" type="button">
+          <h2>Tamis</h2>
+          <h3>Maison senior, habiter le quotidien en des gestes lents</h3>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="../shared/common.js" defer></script>
+
+  <script z-index="1">
+    // ── DONNÉES : images + légende + description ──
+    const slides = [
+      {
+        img: 'img_bruxelles/01.png',
+        caption: 'Élévation ouest',
+        description: ''
+      },
+      {
+        img: 'img_bruxelles/02.jpg',
+        caption: 'Site d\'implantation',
+        description: ''
+      },
+      {
+        img: 'img_bruxelles/03.jpg',
+        caption: 'Dessin axonométrique de Peterbos (proposé par le studio)',
+        description: '',
+        width: ''
+      },
+      {
+        img: 'img_bruxelles/04.png',
+        caption: 'Rez-de-chaussée',
+        description: ''
+      },
+      
+      {
+        img: 'img_bruxelles/05.png',
+        caption: 'Rez-de-chaussée : cuisine communautaire',
+        description: ''
+      },
+      {
+        img: 'img_bruxelles/06_1.png',
+        caption: 'Plan d\'étage',
+        description: '',
+        sequence: [
+          'img_bruxelles/06_1.png',
+          'img_bruxelles/06_2.png',
+          'img_bruxelles/06_3.png',
+          'img_bruxelles/06_4.png'
+        ]
+      },
+      {
+        img: 'img_bruxelles/07.png',
+        caption: 'Coursive : lieu de rencontre',
+        description: ''
+      },
+      {
+        img: 'img_bruxelles/08.png',
+        caption: 'Logement',
+        description: ''
+      },
+      {
+        img: 'img_bruxelles/09.png',
+        caption: 'Coupe schématique : stratégie bioclimatique',
+        description: '',
+        descriptiontop: ''
+      },
+      {
+        img: 'img_bruxelles/10.jpg',
+        caption: 'Noyau de circulation',
+        description: ''
+      },
+      {
+        img: 'img_bruxelles/11.jpg',
+        caption: 'Détail de façade',
+        description: ''
+      },
+      {
+        img: 'img_bruxelles/12.png',
+        caption: 'Dessin axonométrique',
+        description: ''
+      },
+      {
+        img: 'img_bruxelles/14.jpg',
+        caption: '',
+        description: '',
+        width: '60%'
+      },
+    ];
+
+    let current = 0;
+
+    const imgEl          = document.getElementById('project-img');
+    const captionEl      = document.getElementById('img-caption');
+    const progressEl     = document.getElementById('progress');
+    const descriptionEl  = document.getElementById('img-description');
+    const projectViewer  = document.getElementById('project-viewer');
+    const projetGeneral  = document.getElementById('projet-general');
+    const projectTrigger = document.getElementById('project-trigger');
+    const projectPanel   = document.getElementById('project-panel');
+    const backdropEl     = document.getElementById('backdrop');
+
+    let sequenceTimer = null;
+    let sequenceIndex = 0;
+
+    function applyImageWidth(slide) {
+      if (slide.width) {
+        imgEl.style.width = slide.width;
+      } else {
+        imgEl.style.width = 'auto';
+      }
+    }
+
+    function stopSequence() {
+      if (sequenceTimer) {
+        clearInterval(sequenceTimer);
+        sequenceTimer = null;
+      }
+    }
+
+    function startSequence(slide) {
+      applyImageWidth(slide);
+
+      if (!Array.isArray(slide.sequence) || slide.sequence.length === 0) {
+        imgEl.src = slide.img;
+        return;
+      }
+
+      sequenceIndex = 0;
+      imgEl.src = slide.sequence[sequenceIndex];
+
+      sequenceTimer = setInterval(() => {
+        sequenceIndex = (sequenceIndex + 1) % slide.sequence.length;
+        imgEl.src = slide.sequence[sequenceIndex];
+      }, 1500);
+    }
+
+    function showSlide(index) {
+      const slide = slides[index];
+      stopSequence();
+
+      imgEl.alt = slide.caption;
+      captionEl.textContent     = slide.caption;
+      descriptionEl.textContent = slide.description;
+      progressEl.textContent    = `${index + 1} / ${slides.length}`;
+      startSequence(slide);
+    }
+
+    function openProjectPanel() {
+      projetGeneral.classList.add('open');
+      projectViewer.classList.add('blurred');
+      backdropEl.classList.add('visible', 'backdrop-info');
+      projectPanel.classList.add('displayed');
+    }
+
+    function closeProjectPanel() {
+      projetGeneral.classList.remove('open');
+      projectViewer.classList.remove('blurred');
+      backdropEl.classList.remove('visible', 'backdrop-info');
+      projectPanel.classList.remove('displayed');
+    }
+
+    projectTrigger.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      openProjectPanel();
+    });
+
+    backdropEl.addEventListener('click', closeProjectPanel);
+    document.getElementById('panel-close').addEventListener('click', closeProjectPanel);
+
+    function nextSlide() {
+      current = (current + 1) % slides.length;
+      showSlide(current);
+    }
+
+    function prevSlide() {
+      current = (current - 1 + slides.length) % slides.length;
+      showSlide(current);
+    }
+
+    // Navigation clavier
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft')  prevSlide();
+      if (e.key === 'Escape')   closeProjectPanel();
+    });
+
+    // Init
+    showSlide(0);
+  </script>
+
+</body>
+</html>
