@@ -154,13 +154,36 @@ body.project-page .project-slide-nav-hint::after {
   height: auto;
 }
 
+#initial-overlay,
+.drawing img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 #main-image {
   position: relative;
   z-index: 1;
   display: block;
   max-width: 80vw;
   max-height: 80vh;
-  object-fit: contain;
+}
+
+#initial-overlay {
+  position: absolute;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 3s ease;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+#initial-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .drawing {

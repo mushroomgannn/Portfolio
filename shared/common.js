@@ -7,6 +7,7 @@
   const PAGE_TRANSITION_DURATION = 3000;
   const PAGE_TRANSITION_CLASS = 'page-transition';
   const PAGE_VISIBLE_CLASS = 'page-visible';
+  const INITIAL_OVERLAY_FADE_DURATION = 3000;
   let pageNavigationInProgress = false;
 
   function getNavigationUrl(anchor) {
@@ -75,6 +76,18 @@
   function initHomepageInteractiveMap() {
     const homeCanvas = document.getElementById('home-canvas');
     if (!homeCanvas) return;
+
+    const initialOverlay = document.getElementById('initial-overlay');
+    let initialOverlayDismissed = !initialOverlay;
+
+    if (initialOverlay) {
+      initialOverlay.addEventListener('click', (event) => {
+        if (initialOverlayDismissed) return;
+        event.preventDefault();
+        event.stopPropagation();
+        dismissInitialOverlay();
+      });
+    }
 
     const captionContainer = document.createElement('div');
     captionContainer.id = 'drawing-caption-container';
@@ -157,6 +170,7 @@
     };
 
     const findActiveEntry = (clientX, clientY) => {
+      if (!initialOverlayDismissed) return null;
       for (let i = entries.length - 1; i >= 0; i--) {
         const entry = entries[i];
         if (!entry.loaded || !entry.imageData) continue;
@@ -177,6 +191,19 @@
       return null;
     };
 
+    const dismissInitialOverlay = () => {
+      if (!initialOverlay || initialOverlayDismissed) return;
+      initialOverlayDismissed = true;
+      initialOverlay.classList.add('hidden');
+      initialOverlay.style.pointerEvents = 'none';
+      const onTransitionEnd = (event) => {
+        if (event.propertyName !== 'opacity') return;
+        initialOverlay.removeEventListener('transitionend', onTransitionEnd);
+        initialOverlay.style.zIndex = '0';
+      };
+      initialOverlay.addEventListener('transitionend', onTransitionEnd);
+    };
+
     homeCanvas.addEventListener('mousemove', (event) => {
       const activeEntry = findActiveEntry(event.clientX, event.clientY);
       if (activeEntry) {
@@ -191,6 +218,13 @@
     });
 
     homeCanvas.addEventListener('click', (event) => {
+      if (!initialOverlayDismissed && initialOverlay && (event.target === initialOverlay || initialOverlay.contains(event.target))) {
+        event.preventDefault();
+        event.stopPropagation();
+        dismissInitialOverlay();
+        return;
+      }
+
       const activeEntry = findActiveEntry(event.clientX, event.clientY);
       if (!activeEntry) {
         event.preventDefault();
