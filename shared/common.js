@@ -4,23 +4,31 @@
   const assetBase = isProjectPage ? '../' : '';
   const projectBase = isProjectPage ? '' : 'projet/';
 
-  const PAGE_TRANSITION_DURATION = 350;
+  const PAGE_TRANSITION_DURATION = 3000;
   const PAGE_TRANSITION_CLASS = 'page-transition';
   const PAGE_VISIBLE_CLASS = 'page-visible';
   let pageNavigationInProgress = false;
 
+  function getNavigationUrl(anchor) {
+    if (!(anchor instanceof HTMLAnchorElement)) return null;
+    if (anchor.dataset.homeLink !== undefined) return homeLink;
+    return anchor.href || null;
+  }
+
   function isInternalPageLink(anchor) {
     if (!(anchor instanceof HTMLAnchorElement)) return false;
-    if (!anchor.href) return false;
+    if (anchor.dataset.panel !== undefined) return false;
+
+    const urlString = getNavigationUrl(anchor);
+    if (!urlString) return false;
     if (anchor.target && anchor.target !== '_self') return false;
     if (anchor.hasAttribute('download')) return false;
     const rel = anchor.getAttribute('rel');
     if (rel && /\b(external|nofollow|noopener|noreferrer)\b/.test(rel)) return false;
-    const href = anchor.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return false;
+    if (urlString.startsWith('#') || urlString.startsWith('mailto:') || urlString.startsWith('tel:') || urlString.startsWith('javascript:')) return false;
 
     try {
-      const url = new URL(anchor.href, window.location.href);
+      const url = new URL(urlString, window.location.href);
       if (url.origin !== window.location.origin) return false;
       if (url.pathname === window.location.pathname && url.search === window.location.search) return false;
       return true;
@@ -52,7 +60,8 @@
     const anchor = event.target.closest('a');
     if (!anchor || !isInternalPageLink(anchor)) return;
     event.preventDefault();
-    navigateWithTransition(anchor.href);
+    const url = getNavigationUrl(anchor);
+    if (url) navigateWithTransition(url);
   }
 
   function initPageTransition() {
@@ -192,13 +201,13 @@
   initPageTransition();
 
   const projectRows = [
-    { key: 'bruxelles', number: '', href: '2025a_bruxelles.html', title: 'Tamis', subtitle: 'Maison senior, habiter le quotidien en des gestes lents', location: 'Peterbos, Anderlecht, Bruxelles', date: 'A 2025', note: 'Studio Modernités parallèles — ENSA Paris-Malaquais', img: 'homepage_index_image/p1.jpg', imgPos: '0px 50%' },
-    { key: 'bandafassi', number: '', href: '2025h_bandafassi.html', title: 'Centre d\'interprétation culturel et école de métiers', subtitle: 'Entre héritage et renouveaux, un territoire en mouvement', location: 'Bandafassi, Kedougou, Sénégal', date: 'H 2025', note: '', img: 'homepage_index_image/p2.jpg', imgPos: '0px 0px' },
-    { key: 'laubriviere', number: '', href: '2024a_laubriviere.html', title: 'Laubrivière', subtitle: 'Patrimoine, contre-culture et auto-suffisance', location: 'Vieux-Québec, Qc, Canada', date: 'A 2024', note: '', img: 'homepage_index_image/p3.jpg', imgPos: '0px -30px' },
-    { key: 'treehouse', number: '', href: '2024h_saint-roch.html', title: 'Treehouse', subtitle: 'Maison unifamiliale', location: 'St-Roch, Qc, Canada', date: 'H 2024', note: '', img: 'homepage_index_image/p4.jpg', imgPos: '0px 0px' },
-    { key: 'shit', number: '', href: '2025h_toilette-numerique.html', title: 'Sh*t', subtitle: 'Figuration et conceptualisation numérique d\'une toilette publique', location: 'Manhattan, New York, États-Unis', date: 'H 2025', note: 'Premier prix — concours amical d\'architecture numérique, Université Laval Publication revue Memento 2025', img: 'homepage_index_image/p7.png', imgPos: '0px 0px' },
-    { key: 'coworking', number: '', href: '2025a_enveloppe.html', title: 'Espace coworking', subtitle: 'Anatomie systématique du bâtiment', location: 'Lévis, Qc, Canada', date: 'A 2025', note: '', img: 'homepage_index_image/p6.jpg', imgPos: '0px 0px' },
-    { key: 'trilogie', number: '', href: '2024a_figuration-conception.html', title: 'Trilogie matérielle', subtitle: 'Conceptualisation et interprétation spatiale architectonique', location: 'Paysage imaginée', date: 'A 2024', note: '', img: 'homepage_index_image/p5.jpg', imgPos: 'center center' },
+    { key: 'bruxelles', number: '', href: '2025a_bruxelles.html', title: 'Tamis', subtitle: 'Maison senior, habiter le quotidien en des gestes lents', location: 'Bruxelles, Belgique', date: 'A 2025', note: 'Studio Modernités parallèles — ENSA Paris-Malaquais', img: 'homepage_index_image/p1.jpg', imgPos: '0px 50%' },
+    { key: 'bandafassi', number: '', href: '2025h_bandafassi.html', title: 'Centre d\'interprétation culturel et école de métiers', subtitle: 'Entre héritage et renouveaux, un territoire en mouvement', location: 'Bandafassi, Sénégal', date: 'H 2025', note: '', img: 'homepage_index_image/p2.jpg', imgPos: '0px 0px' },
+    { key: 'laubriviere', number: '', href: '2024a_laubriviere.html', title: 'Laubrivière', subtitle: 'Patrimoine, contre-culture et auto-suffisance', location: 'Québec, Canada', date: 'A 2024', note: '', img: 'homepage_index_image/p3.jpg', imgPos: '0px -30px' },
+    { key: 'treehouse', number: '', href: '2024h_saint-roch.html', title: 'Treehouse', subtitle: 'Maison unifamiliale', location: 'Québec, Canada', date: 'H 2024', note: '', img: 'homepage_index_image/p4.jpg', imgPos: '0px 0px' },
+    { key: 'shit', number: '', href: '2025h_toilette-numerique.html', title: 'Sh*t', subtitle: 'Figuration et conceptualisation numérique d\'une toilette publique', location: 'New York, États-Unis', date: 'H 2025', note: 'Premier prix — concours amical d\'architecture numérique, Université Laval Publication revue Memento 2025', img: 'homepage_index_image/p7.png', imgPos: '0px 0px' },
+    { key: 'coworking', number: '', href: '2025a_enveloppe.html', title: 'Espace coworking', subtitle: 'Anatomie systématique du bâtiment', location: 'Lévis, Canada', date: 'A 2025', note: '', img: 'homepage_index_image/p6.jpg', imgPos: '0px 0px' },
+    { key: 'trilogie', number: '', href: '2024a_figuration-conception.html', title: 'Trilogie matérielle', subtitle: 'Conceptualisation et interprétation spatiale architectonique', location: 'Paysage imaginé', date: 'A 2024', note: '', img: 'homepage_index_image/p5.jpg', imgPos: 'center center' },
     { key: 'livre-d-artiste', number: '', href: '2024h_livre-d-artiste.html', title: 'Livre d\'artiste', subtitle: 'Carrières Centrales, modernisme au Maroc dans les années 50', location: 'Casablanca, Maroc', date: 'H 2024', note: '', img: 'homepage_index_image/p8.png', imgPos: 'center center' },
     { key: 'divers', number: '', href: 'divers.html', title: 'Divers', subtitle: '', location: '', date: '', note: '', img: 'homepage_index_image/p9.jpg', imgPos: '0px 26%' }
   ];
@@ -625,21 +634,10 @@
 
     row.addEventListener('click', () => {
       const href = row.dataset.href;
-      if (!href) return;
-      const isDivers = href.endsWith('divers.html');
+      if (!href || pageNavigationInProgress) return;
       rows.forEach(r => r.classList.remove('hovered'));
       document.querySelectorAll('.project-swatch.hovered').forEach(block => block.classList.remove('hovered'));
-      if (!isDivers) {
-        const panelIndex = document.getElementById('panelindex');
-        if (panelIndex) {
-          panelIndex.classList.add('fade-out');
-        }
-        setTimeout(() => {
-          window.location.href = href;
-        }, 2000);
-      } else {
-        window.location.href = href;
-      }
+      navigateWithTransition(href);
     });
   });
 

@@ -1,28 +1,256 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Divers</title>
   <link rel="stylesheet" href="../0_homepage.css">
 </head>
-<script src="../shared/common.js" defer></script>
-<body>
-  <main id="main-content">
-    <article>
-      <p></p>
 
-      <section class="slideshow">
-        <div class="slideshow-inner">
-          <img class="slide" src="img_divers/la_meme_1.jpg" scale="0.7">
-          <img class="slide" src="img_divers/photographie_1.jpg" >
-          <img class="slide" src="img_divers/CAPO_1.png" >
-          <img class="slide" src="img_divers/la_meme_2.jpg" >
-          <img class="slide" src="img_divers/Finlandia_Hall.png">
-          <img class="slide" src="img_divers/portrait.png" >
-          <img class="slide" src="img_divers/CAPO_2.png">
-          <img class="slide" src="img_divers/texture.jpg" >
-          <img class="slide" src="img_divers/Reel.png" >
-          <img class="slide" src="img_divers/Surréel.png" >
-        </div>  
-        <div class="slideshow-caption"></div>
+<body class="page-transition">
+  <main>
+
+    <!-- ZONES DE CLIC -->
+    <div id="click-left"  onclick="prevSlide()"></div>
+    <div id="click-right" onclick="nextSlide()"></div>
+
+    <!-- VISIONNEUSE -->
+    <div id="project-viewer">
+      <div id="sequence-container"></div>
+      <img id="project-img" src="" alt="">
+      <div id="slide-meta">
+        <div id="img-caption"></div>
+        <div id="progress"></div>
+      </div>
+    </div>
+
+    <div id="backdrop" class="backdrop-info"></div>
+    <div class="panel" id="project-panel">
+      <h4>Une sélection de créations entre 2021 et 2026</h4>
+      <h3></h3>
+      <button id="panel-close" type="button">x</button>
+    </div>
+
+    <!-- INFOS PROJET -->
+    <div id="projet-info">
+
+      <!-- Description liée à l'image — change dynamiquement -->
+      <div id="img-description"></div>
+
+      <div class="info-divider"></div>
+
+      <!-- Infos générales — fixes -->
+      <div id="projet-general">
+        <button id="project-trigger" type="button">
+          <h2>Divers</h2>
+          <h3>Le monde à travers mes yeux</h3>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="../shared/common.js" defer></script>
+
+  <script z-index="1">
+    // ── DONNÉES : images + légende + description ──
+    const slides = [
+      {
+        img: 'Img_divers/01.jpg',
+        caption: 'Une friche, photographie, 2025',
+        description: ''
+      },
+      {
+        img: 'Img_divers/02.jpg',
+        caption: 'Studio de travail',
+        description: ''
+      },
+      {
+        img: 'Img_divers/03.jpg',
+        caption: '« La mémé », Dessin à la main réalisé dans le cadre du cours Perfectionnement dessin, Supervisé par Yves Bélorgey, 2025',
+        description: '',
+      },
+      {
+        img: 'Img_divers/04.jpg',
+        caption: 'Photo argentique, dévelopé en 2023',
+        description: ''
+      },
+      
+      {
+        img: 'Img_divers/05.jpg',
+        caption: 'Photo argentique, dévelopé en 2023',
+        description: '',
+      },
+      {
+        img: 'Img_divers/06.jpg',
+        caption: 'Photo argentique, dévelopé en 2023',
+        description: '',
+        
+      },
+      {
+        img: 'Img_divers/07.png',
+        caption: 'Dessin à la main, supervisé par Fabio Maria Sedia, 2024',
+        description: ''
+      },
+       {
+        img: 'Img_divers/08.png',
+        caption: 'Collage, supervisé par Fabio Maria Sedia, 2024',
+        description: ''
+      },     
+       {
+        img: 'Img_divers/09.png',
+        caption: 'Photo argentique, dévelopé en 2023',
+        description: ''
+      },     
+      {
+          img: 'Img_divers/10.jpg',
+          caption: 'Photo argentique, dévelopé en 2023',
+          description: ''
+        },     
+        {
+          img: 'Img_divers/11.jpg',
+          caption: 'Photo argentique, dévelopé en 2023',
+          description: ''
+        },     
+        {
+          img: 'Img_divers/12.jpg',
+          caption: 'Photo argentique, dévelopé en 2023',
+          description: ''
+        },     
+        {
+          img: 'Img_divers/13.jpg',
+          caption: 'Dessin à la main, supervisé par Fabio Maria Sedia, 2023',
+          description: ''
+        },     
+        {
+          img: 'Img_divers/14.png',
+          caption: 'Croquis de Capo Residence / Atelier Carle, 2024, superisé par Thibault Nguyen',
+          description: ''
+        },     
+        {
+          img: 'Img_divers/15.png',
+          caption: 'Croquis de Capo Residence / Atelier Carle, 2024, superisé par Thibault Nguyen',
+          description: ''
+        },
+         {
+          img: 'Img_divers/16.png',
+          caption: 'Croquis de Finlandia Hall / Alvar Aalto, 2024',
+          description: ''
+        },     
+         {
+          img: 'Img_divers/17.png',
+          caption: 'Portrait, 2022',
+          description: ''
+        },     
+         {
+          img: 'Img_divers/18.jpg',
+          caption: 'Vue intérieure',
+          description: ''
+        },     
+    ];
+
+    let current = 0;
+
+    const imgEl          = document.getElementById('project-img');
+    const captionEl      = document.getElementById('img-caption');
+    const progressEl     = document.getElementById('progress');
+    const descriptionEl  = document.getElementById('img-description');
+    const projectViewer  = document.getElementById('project-viewer');
+    const projetGeneral  = document.getElementById('projet-general');
+    const projectTrigger = document.getElementById('project-trigger');
+    const projectPanel   = document.getElementById('project-panel');
+    const backdropEl     = document.getElementById('backdrop');
+
+    let sequenceTimer = null;
+    let sequenceIndex = 0;
+
+    function applyImageWidth(slide) {
+      if (slide.width) {
+        imgEl.style.width = slide.width;
+      } else {
+        imgEl.style.width = 'auto';
+      }
+    }
+
+    function stopSequence() {
+      if (sequenceTimer) {
+        clearInterval(sequenceTimer);
+        sequenceTimer = null;
+      }
+    }
+
+    function startSequence(slide) {
+      applyImageWidth(slide);
+
+      if (!Array.isArray(slide.sequence) || slide.sequence.length === 0) {
+        imgEl.src = slide.img;
+        return;
+      }
+
+      sequenceIndex = 0;
+      imgEl.src = slide.sequence[sequenceIndex];
+
+      sequenceTimer = setInterval(() => {
+        sequenceIndex = (sequenceIndex + 1) % slide.sequence.length;
+        imgEl.src = slide.sequence[sequenceIndex];
+      }, 1500);
+    }
+
+    function showSlide(index) {
+      const slide = slides[index];
+      stopSequence();
+
+      imgEl.alt = slide.caption;
+      captionEl.textContent     = slide.caption;
+      descriptionEl.textContent = slide.description;
+      progressEl.textContent    = `${index + 1} / ${slides.length}`;
+      startSequence(slide);
+    }
+
+    function openProjectPanel() {
+      projetGeneral.classList.add('open');
+      projectViewer.classList.add('blurred');
+      backdropEl.classList.add('visible', 'backdrop-info');
+      projectPanel.classList.add('displayed');
+    }
+
+    function closeProjectPanel() {
+      projetGeneral.classList.remove('open');
+      projectViewer.classList.remove('blurred');
+      backdropEl.classList.remove('visible', 'backdrop-info');
+      projectPanel.classList.remove('displayed');
+    }
+
+    projectTrigger.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      openProjectPanel();
+    });
+
+    backdropEl.addEventListener('click', closeProjectPanel);
+    document.getElementById('panel-close').addEventListener('click', closeProjectPanel);
+
+    function nextSlide() {
+      current = (current + 1) % slides.length;
+      showSlide(current);
+    }
+
+    function prevSlide() {
+      current = (current - 1 + slides.length) % slides.length;
+      showSlide(current);
+    }
+
+    // Navigation clavier
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft')  prevSlide();
+      if (e.key === 'Escape')   closeProjectPanel();
+    });
+
+    // Init
+    showSlide(0);
+  </script>
+
+</body>
+</html>

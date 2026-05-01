@@ -11,7 +11,7 @@
   --base-h: calc((100vh - var(--nav-h)) / var(--rows));
   --hover-h: calc(var(--base-h) * 2);
   --shrink-h: calc((100vh - var(--nav-h) - var(--hover-h)) / (var(--rows) - 1));
-  --dur: 350ms;
+  --dur: 3000ms;
   --page-transition-duration: var(--dur);
   --project-bruxelles: #b34a26;
   --project-bandafassi: #2b5d34;
@@ -48,11 +48,6 @@ body.project-page p,
 body.project-page span,
 body.project-page a,
 body.project-page button {
-  color: var(--project-color, var(--text));
-}
-
-
-body.project-page .corner {
   color: var(--project-color, var(--text));
 }
 
@@ -201,7 +196,11 @@ body.project-page .project-slide-nav-hint::after {
 
 
 
-
+p {
+  text-align: justify;
+  text-justify: inter-word;
+  font-family: "Avenir next", "Roboto Condensed", sans-serif;
+  }
 
 
 h1 {
@@ -467,6 +466,10 @@ main
 
 .corner:not(.active) {
   opacity: 0.9;
+}
+
+body.project-page .corner {
+  color: var(--project-color, var(--text));
 }
 
 #btn-accueil { top: 0%; left: 10px; }
@@ -890,18 +893,6 @@ th {
   filter: brightness(0.92);
   transform: scaleY(0.98);
 }
-
-.project-row.clicked {
-  animation: expandFill 800ms forwards cubic-bezier(0.22, 1, 0.36, 1);
-  z-index: 50;
-}
-
-/*@keyframes expandFill {
-  0%   { transform: scale(1);  opacity: 1; }
-  60%  { transform: scale(5);  opacity: 0.8; }
-  100% { transform: scale(12); opacity: 0; }
-}
-*/
 
 
 /* ── PANEL INFO ── */
