@@ -1,6 +1,6 @@
 (function() {
   const isProjectPage = window.location.pathname.includes('/projet/');
-  const homeLink = isProjectPage ? '../0_homepage.html' : '0_homepage.html';
+  const homeLink = isProjectPage ? '../index.html' : 'index.html';
   const assetBase = isProjectPage ? '../' : '';
   const projectBase = isProjectPage ? '' : 'projet/';
 
